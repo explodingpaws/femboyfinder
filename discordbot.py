@@ -14,7 +14,6 @@ intents = nextcord.Intents.default()
 botMain = nextcord.Client(intents=intents, activity=nextcord.Game(name='find femboys with /find'))
 
 token = os.getenv('botToken')
-tags = os.getenv('tagList')
 
 defaultTaglist = [
     "rating:explicit",
