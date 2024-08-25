@@ -60,7 +60,7 @@ async def on_ready():
     print("Ready!")
 # logs in the bot
 
-@botMain.slash_command(name="debug", description="find femboys")
+@botMain.slash_command(name="find", description="find femboys")
 async def find(interaction=nextcord.Interaction,
                videos_only: bool = nextcord.SlashOption(description="Require posts to be video", required=False),
                minimum_score: int = nextcord.SlashOption(description="Minimum score value", required=False),
