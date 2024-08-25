@@ -60,16 +60,15 @@ async def on_ready():
     print("Ready!")
 # logs in the bot
 
-@botMain.slash_command(name="find", description="find femboys")
+@botMain.slash_command(name="debug", description="find femboys")
 async def find(interaction=nextcord.Interaction,
                videos_only: bool = nextcord.SlashOption(description="Require posts to be video", required=False),
                minimum_score: int = nextcord.SlashOption(description="Minimum score value", required=False),
                tags: str = nextcord.SlashOption(description="Custom tags (seperate with commas)", required=False)
                ):
     scoreRequirement = 40  # arbitrarily set this based on a lot of content being more eh as it goes down
-    if not interaction.channel.is_nsfw():
-        await interaction.response.send_message("not an nsfw channel")
-    else:
+
+    if interaction.channel.is_nsfw():
         if minimum_score is not None:
             scoreRequirement = minimum_score
         scoreString = "score:>=" + str(scoreRequirement)
@@ -78,11 +77,13 @@ async def find(interaction=nextcord.Interaction,
             scoreString,
             "order:random"
         ]
+        
         if tags is not None:
             tagsAdded = [
                 tags
             ]
             tagList.extend(tagsAdded)
+            # Additional tags
         if videos_only is not None:
             tagsAdded = [
                 "video"
@@ -104,7 +105,7 @@ async def find(interaction=nextcord.Interaction,
         else:
             randomPost = postSearch[random.randrange(0, maxPosts)]
             if videos_only:
-                for count in range(25):
+                for count in range(maxPosts):
                     if randomPost.file.ext == "webm" or randomPost.file.ext == "mov" or randomPost.file.ext == "mp4":
                         url = "https://e621.net/posts/" + str(randomPost.id)
                         embedLink = "[Link To Video](" + url + ")"
@@ -112,23 +113,28 @@ async def find(interaction=nextcord.Interaction,
                         break
                     else:
                         randomPost = postSearch[random.randrange(0, maxPosts)]
-                    if count == 25:
+                    if count == maxPosts:
                         await interaction.response.send_message("no videos could be found")
                 # repeats loop a few times since sometimes people label other file formats as "video"
                 # gifs can be posted as regular embeds
             else:
-                url = "https://e621.net/posts/" + str(randomPost.id)
-                embedLink = "[Link To Image](" + url + ")"
-                embedObj = nextcord.Embed(title="Artist: " + randomPost.tags.artist[0],
-                                          description=embedLink + "\n Score of: " + str(randomPost.score.total),
-                                          color=0x00549E)
-                embedObj.set_image(url=randomPost.file.url)
-                embedObj.set_footer(text="Post from e621",
-                                    icon_url="https://static.wikia.nocookie.net/logopedia/images/0/0b/Logo_transparent.svg/revision/latest/scale-to-width-down/300?cb=20181119223528g")
-                await interaction.response.send_message(embed=embedObj)
-                # includes a little footer image, artist (if valid) and score
-                
-botMain.run(token)
+                for count in range(maxPosts):
+                    if randomPost.file.ext != "webm" or randomPost.file.ext != "mov" or randomPost.file.ext != "mp4":
+                        url = "https://e621.net/posts/" + str(randomPost.id)
+                        embedLink = "[Link To Image](" + url + ")"
+                        embedObj = nextcord.Embed(title="Artist: " + randomPost.tags.artist[0],
+                                                  description=embedLink + "\n Score of: " + str(randomPost.score.total),
+                                                  color=0x00549E)
+                        embedObj.set_image(url=randomPost.file.url)
+                        embedObj.set_footer(text="Post from e621",
+                                            icon_url="https://static.wikia.nocookie.net/logopedia/images/0/0b/Logo_transparent.svg/revision/latest/scale-to-width-down/300?cb=20181119223528g")
+                        await interaction.response.send_message(embed=embedObj) # includes a little footer image, artist (if valid) and score
+                        break
+                    if count == maxPosts:
+                        await interaction.response.send_message("no valid images could be found")
+                        break
+                    randomPost = postSearch[random.randrange(0, maxPosts)]
+                    # Loops through the post search incase no images are found, which it will exit if so
 
-token = os.getenv('botToken')
+
 botMain.run(token)
