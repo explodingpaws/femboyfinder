@@ -122,7 +122,10 @@ async def find(interaction=nextcord.Interaction,
                     if randomPost.file.ext != "webm" or randomPost.file.ext != "mov" or randomPost.file.ext != "mp4":
                         url = "https://e621.net/posts/" + str(randomPost.id)
                         embedLink = "[Link To Image](" + url + ")"
-                        embedObj = nextcord.Embed(title="Artist: " + randomPost.tags.artist[0],
+                        artist = randomPost.tags.artist[0]
+                        if randomPost.tags.artist[0] == "conditiona l_dnp":
+                            artist = randomPost.tags.artist[1]
+                        embedObj = nextcord.Embed(title="Artist: " + artist,
                                                   description=embedLink + "\n Score of: " + str(randomPost.score.total),
                                                   color=0x00549E)
                         embedObj.set_image(url=randomPost.file.url)
