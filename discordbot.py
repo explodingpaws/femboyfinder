@@ -14,6 +14,7 @@ intents = nextcord.Intents.default()
 botMain = nextcord.Client(intents=intents, activity=nextcord.Game(name='find femboys with /find'))
 
 token = os.getenv('botToken')
+tags = os.getenv('tagList')
 
 defaultTaglist = [
     "rating:explicit",
@@ -46,29 +47,22 @@ defaultTaglist = [
     "-nintendo",
     "-pokemon",
     "-my_little_pony",
-    "-sonic_the_hedgehog_(series)"
+    "-sonic_the_hedgehog_(series)",
+    "-buff"
 ]
 
 # all whitelist/blacklist items must be separated by commas and put into quotation marks
 # all filters and tags can be found at the cheatsheet link below
 # https://e621.net/help/cheatsheet
 
-@botMain.event
-async def on_ready():
-    print(f'Logged in as {botMain.user} (ID: {botMain.user.id})')
-    print('------------------------------------------------')
-    print("Ready!")
-# logs in the bot
-
-@botMain.slash_command(name="find", description="find femboys")
+@botMain.slash_command(name="find", description="find femboys", dm_permission=True)
 async def find(interaction=nextcord.Interaction,
                videos_only: bool = nextcord.SlashOption(description="Require posts to be video", required=False),
                minimum_score: int = nextcord.SlashOption(description="Minimum score value", required=False),
                tags: str = nextcord.SlashOption(description="Custom tags (seperate with commas)", required=False)
                ):
-    scoreRequirement = 40  # arbitrarily set this based on a lot of content being more eh as it goes down
-
-    if interaction.channel.is_nsfw():
+    scoreRequirement = 200  # arbitrarily set this based on a lot of content being more eh as it goes down
+    if interaction.guild is None or (interaction.channel and interaction.channel.is_nsfw()):
         if minimum_score is not None:
             scoreRequirement = minimum_score
         scoreString = "score:>=" + str(scoreRequirement)
@@ -77,13 +71,11 @@ async def find(interaction=nextcord.Interaction,
             scoreString,
             "order:random"
         ]
-        
         if tags is not None:
             tagsAdded = [
                 tags
             ]
             tagList.extend(tagsAdded)
-            # Additional tags
         if videos_only is not None:
             tagsAdded = [
                 "video"
@@ -123,7 +115,7 @@ async def find(interaction=nextcord.Interaction,
                         url = "https://e621.net/posts/" + str(randomPost.id)
                         embedLink = "[Link To Image](" + url + ")"
                         artist = randomPost.tags.artist[0]
-                        if randomPost.tags.artist[0] == "conditiona l_dnp":
+                        if randomPost.tags.artist[0] == "conditional_dnp":
                             artist = randomPost.tags.artist[1]
                         embedObj = nextcord.Embed(title="Artist: " + artist,
                                                   description=embedLink + "\n Score of: " + str(randomPost.score.total),
@@ -137,7 +129,17 @@ async def find(interaction=nextcord.Interaction,
                         await interaction.response.send_message("no valid images could be found")
                         break
                     randomPost = postSearch[random.randrange(0, maxPosts)]
-                    # Loops through the post search incase no images are found, which it will exit if so
+    else:
+        await interaction.response.send_message("not an nsfw channel")
+
+
+@botMain.event
+async def on_ready():
+    print(f'Logged in as {botMain.user} (ID: {botMain.user.id})')
+    print('------------------------------------------------')
+    print("Ready!")
+    await botMain.sync_application_commands()
+# logs in the bot
 
 
 botMain.run(token)
