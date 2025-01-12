@@ -100,7 +100,7 @@ async def find(interaction=nextcord.Interaction,
 
         if extratags is not None:
             tagsAdded = [
-                tags
+                extratags
             ]
             tagList.extend(tagsAdded)
             # Additional tags
@@ -126,7 +126,7 @@ async def find(interaction=nextcord.Interaction,
             randomPost = postSearch[random.randrange(0, maxPosts)]
             if videoonly:
                 for count in range(maxPosts):
-                    if randomPost.file.ext == "webm" or randomPost.file.ext == "mov" or randomPost.file.ext == "mp4":
+                    if randomPost.file.ext == ".webm" or randomPost.file.ext == ".mov" or randomPost.file.ext == ".mp4":
                         url = "https://e621.net/posts/" + str(randomPost.id)
                         embedLink = "[Link To Video](" + url + ")"
                         await interaction.response.send_message(embedLink)
@@ -139,7 +139,7 @@ async def find(interaction=nextcord.Interaction,
                 # gifs can be posted as regular embeds
             else:
                 for count in range(maxPosts):
-                    if randomPost.file.ext != "webm" or randomPost.file.ext != "mov" or randomPost.file.ext != "mp4":
+                    if randomPost.file.ext != "webm" and randomPost.file.ext != "mov" and randomPost.file.ext != "mp4":
                         url = "https://e621.net/posts/" + str(randomPost.id)
                         embedLink = "[Link To Image](" + url + ")"
                         artist = randomPost.tags.artist[0]
@@ -154,11 +154,7 @@ async def find(interaction=nextcord.Interaction,
                         await interaction.response.send_message(
                             embed=embedObj)  # includes a little footer image, artist (if valid) and score
                         break
-                    if count == maxPosts:
-                        await interaction.response.send_message("no valid images could be found")
-                        break
-                    randomPost = postSearch[random.randrange(0, maxPosts)]
+                    elif count == 49:
+                        await interaction.response.send_message("no images could be found")
                     # Loops through the post search incase no images are found, which it will exit if so
-
-
 botMain.run(token)
