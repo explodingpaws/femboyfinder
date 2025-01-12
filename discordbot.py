@@ -44,7 +44,6 @@ async def on_ready():
     print('------------------------------------------------')
     print("Ready!")
 
-
 # logs in the bot
 @botMain.slash_command(name="find", description="find femboys")
 async def find(interaction=nextcord.Interaction,
@@ -53,12 +52,13 @@ async def find(interaction=nextcord.Interaction,
                                                                                      "Straight" : 2,
                                                                                      "Lesbian" : 3,
                                                                                      "Futa" : 4,
+                                                                                     "Femboy" : 5
                                                                                      }),
                videoonly: bool = nextcord.SlashOption(description="Require posts to be video", required=False),
                minscore: int = nextcord.SlashOption(description="Minimum score value", required=False),
                extratags: str = nextcord.SlashOption(description="Custom tags (seperate with commas)", required=False)
                ):
-    scoreRequirement = 40  # arbitrarily set this based on a lot of content being more eh as it goes down
+    scoreRequirement = 400  # arbitrarily set this based on a lot of content being more eh as it goes down
 
     scoreString = "score:>=" + str(scoreRequirement)
 
@@ -89,6 +89,12 @@ async def find(interaction=nextcord.Interaction,
         elif sexualpreference == 4:
             tagsAdded = [
                 "Futa"
+            ]
+            tagList.extend(tagsAdded)
+        elif sexualpreference == 5:
+            tagsAdded = [
+                "gay",
+                "femboy"
             ]
             tagList.extend(tagsAdded)
 
